@@ -1,0 +1,3154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeTalk - Ваше общение, наш сервис</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #36393f;
+            color: #dcddde;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body.light-theme {
+            background-color: #f8f9fa;
+            color: #2e3338;
+        }
+
+        body.light-theme .auth-box,
+        body.light-theme .server-sidebar,
+        body.light-theme .friends-sidebar,
+        body.light-theme .chat-area,
+        body.light-theme .user-panel,
+        body.light-theme .channel-sidebar,
+        body.light-theme .members-sidebar {
+            background-color: #ffffff;
+            color: #2e3338;
+        }
+
+        body.light-theme .friends-header,
+        body.light-theme .chat-header,
+        body.light-theme .channel-header {
+            border-bottom: 1px solid #e3e5e8;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .form-group input,
+        body.light-theme .message-input,
+        body.light-theme .server-form-group input {
+            background-color: #f2f3f5;
+            border: 1px solid #e3e5e8;
+            color: #2e3338;
+        }
+
+        body.light-theme .friends-tabs {
+            border-bottom: 1px solid #e3e5e8;
+        }
+
+        body.light-theme .no-friends,
+        body.light-theme .welcome-message p,
+        body.light-theme .message-time,
+        body.light-theme .friend-status-text,
+        body.light-theme .member-status-text,
+        body.light-theme .category-header {
+            color: #747f8d;
+        }
+
+        body.light-theme .user-status {
+            color: #747f8d;
+        }
+
+        body.light-theme .channel-item,
+        body.light-theme .channel-item .hash,
+        body.light-theme .channel-item .voice {
+            color: #8e9297;
+        }
+
+        body.light-theme .channel-item:hover,
+        body.light-theme .add-channel:hover {
+            color: #2e3338;
+        }
+
+        body.light-theme .server-settings,
+        body.light-theme .user-control {
+            color: #747f8d;
+        }
+
+        body.light-theme .server-settings:hover,
+        body.light-theme .user-control:hover {
+            color: #2e3338;
+        }
+
+        /* Loading screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #36393f;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #7289da;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 18px;
+            color: #b9bbbe;
+        }
+
+        /* Auth forms */
+        .auth-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-box {
+            background-color: #36393f;
+            width: 480px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
+            padding: 32px;
+            position: relative;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            color: #b9bbbe;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .close-button:hover {
+            color: white;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .auth-header h2 {
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .auth-header p {
+            color: #b9bbbe;
+            font-size: 14px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b9bbbe;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            background-color: #303339;
+            border: 1px solid #222428;
+            border-radius: 3px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            border-color: #7289da;
+            outline: none;
+        }
+
+        .auth-button {
+            background-color: #7289da;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 3px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .auth-button:hover {
+            background-color: #677bc4;
+        }
+
+        .auth-footer {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #72767d;
+        }
+
+        .auth-footer a {
+            color: #7289da;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #f04747;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Main app */
+        .app-container {
+            display: none;
+            height: 100vh;
+        }
+
+        .server-sidebar {
+            width: 72px;
+            background-color: #202225;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 12px;
+            overflow-y: auto;
+        }
+
+        .server-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #36393f;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #dcddde;
+            font-weight: bold;
+            cursor: pointer;
+            transition: border-radius 0.2s, background-color 0.2s;
+            position: relative;
+        }
+
+        .server-icon:hover {
+            border-radius: 16px;
+            background-color: #7289da;
+        }
+
+        .add-server {
+            background-color: #36393f;
+            color: #3ba55c;
+            font-size: 24px;
+        }
+
+        .add-server:hover {
+            background-color: #3ba55c;
+            color: white;
+        }
+
+        .server-active {
+            border-radius: 16px;
+            background-color: #7289da;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+
+        .friends-sidebar {
+            width: 240px;
+            background-color: #2f3136;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .friends-header {
+            padding: 16px;
+            border-bottom: 1px solid #26282c;
+            font-weight: bold;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .friends-tabs {
+            display: flex;
+            border-bottom: 1px solid #26282c;
+        }
+
+        .tab {
+            padding: 16px;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid #7289da;
+            color: white;
+        }
+
+        .friends-list {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .friend-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .friend-item:hover {
+            background-color: rgba(114, 137, 218, 0.1);
+        }
+
+        .friend-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #7289da;
+            margin-right: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: white;
+            position: relative;
+        }
+
+        .friend-status {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #747f8d;
+            bottom: -2px;
+            right: -2px;
+            border: 2px solid #2f3136;
+        }
+
+        .friend-status.online {
+            background-color: #3ba55c;
+        }
+
+        .friend-status.dnd {
+            background-color: #ed4245;
+        }
+
+        .friend-info {
+            flex: 1;
+        }
+
+        .friend-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .friend-status-text {
+            font-size: 12px;
+            color: #72767d;
+        }
+
+        .no-friends {
+            text-align: center;
+            margin-top: 50px;
+            color: #72767d;
+        }
+
+        .add-friend-form {
+            padding: 16px;
+            display: none;
+        }
+
+        .add-friend-form input {
+            width: 100%;
+            padding: 8px;
+            background-color: #303339;
+            border: 1px solid #222428;
+            border-radius: 3px;
+            color: white;
+        }
+
+        .add-friend-button {
+            background-color: #7289da;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 3px;
+            margin-top: 8px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .chat-area {
+            flex: 1;
+            background-color: #36393f;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid #26282c;
+            font-weight: bold;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #7289da;
+            margin-right: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .message-author {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #72767d;
+        }
+
+        .message-text {
+            line-height: 1.4;
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .welcome-message h2 {
+            margin-bottom: 16px;
+        }
+
+        .welcome-message p {
+            color: #72767d;
+        }
+
+        .user-panel {
+            background-color: #292b2f;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #7289da;
+            border-radius: 50%;
+            margin-right: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .username {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .user-status {
+            font-size: 12px;
+            color: #72767d;
+        }
+
+        .user-controls {
+            display: flex;
+        }
+
+        .user-control {
+            margin-left: 8px;
+            color: #b9bbbe;
+            cursor: pointer;
+        }
+
+        /* Avatar modal */
+        .avatar-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .avatar-modal-content {
+            background-color: #36393f;
+            width: 400px;
+            border-radius: 5px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .avatar-close-button {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            color: #b9bbbe;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .avatar-close-button:hover {
+            color: white;
+        }
+
+        .avatar-modal-header {
+            margin-bottom: 20px;
+        }
+
+        .avatar-modal-header h3 {
+            color: white;
+        }
+
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #202225;
+            margin: 0 auto 20px;
+            overflow: hidden;
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-upload {
+            margin-bottom: 20px;
+        }
+
+        .avatar-upload input {
+            display: none;
+        }
+
+        .avatar-upload-label {
+            display: block;
+            background-color: #7289da;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .avatar-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .avatar-cancel-button {
+            background-color: transparent;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .avatar-save-button {
+            background-color: #7289da;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        /* Server modal */
+        .server-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .server-modal-content {
+            background-color: #36393f;
+            width: 440px;
+            border-radius: 5px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .server-close-button {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            color: #b9bbbe;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .server-close-button:hover {
+            color: white;
+        }
+
+        .server-modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .server-modal-header h3 {
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .server-modal-header p {
+            color: #b9bbbe;
+        }
+
+        .server-form-group {
+            margin-bottom: 20px;
+        }
+
+        .server-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b9bbbe;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .server-form-group input {
+            width: 100%;
+            padding: 10px;
+            background-color: #303339;
+            border: 1px solid #222428;
+            border-radius: 3px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .server-form-group input:focus {
+            border-color: #7289da;
+            outline: none;
+        }
+
+        .server-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .server-cancel-button {
+            background-color: transparent;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .server-create-button {
+            background-color: #7289da;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        /* Channel sidebar */
+        .channel-sidebar {
+            width: 240px;
+            background-color: #2f3136;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .channel-header {
+            padding: 16px;
+            border-bottom: 1px solid #26282c;
+            font-weight: bold;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .server-settings {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            cursor: pointer;
+            color: #b9bbbe;
+        }
+
+        .server-settings:hover {
+            color: white;
+        }
+
+        .server-settings-dropdown {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background-color: #18191c;
+            border-radius: 4px;
+            padding: 8px;
+            min-width: 200px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: none;
+        }
+
+        .server-settings-item {
+            padding: 8px;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .server-settings-item:hover {
+            background-color: #7289da;
+        }
+
+        .server-settings-item.delete {
+            color: #ed4245;
+        }
+
+        .server-settings-item.delete:hover {
+            background-color: rgba(237, 66, 69, 0.1);
+        }
+
+        .channel-category {
+            margin-top: 16px;
+        }
+
+        .category-header {
+            padding: 8px 16px;
+            color: #72767d;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .channel-item {
+            padding: 8px 16px;
+            color: #8e9297;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .channel-item:hover {
+            background-color: rgba(114, 137, 218, 0.1);
+            color: #dcddde;
+        }
+
+        .channel-item.active {
+            background-color: rgba(114, 137, 218, 0.2);
+            color: white;
+        }
+
+        .channel-item .hash {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        .channel-item .voice {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        /* Members sidebar */
+        .members-sidebar {
+            width: 240px;
+            background-color: #2f3136;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .members-header {
+            margin-bottom: 16px;
+            font-weight: bold;
+            color: #b9bbbe;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .member-item:hover {
+            background-color: rgba(114, 137, 218, 0.1);
+        }
+
+        .member-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #7289da;
+            margin-right: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: white;
+            position: relative;
+        }
+
+        .member-status {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #747f8d;
+            bottom: -2px;
+            right: -2px;
+            border: 2px solid #2f3136;
+        }
+
+        .member-status.online {
+            background-color: #3ba55c;
+        }
+
+        .member-status.dnd {
+            background-color: #ed4245;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .member-status-text {
+            font-size: 12px;
+            color: #72767d;
+        }
+
+        /* Settings modal */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .settings-modal-content {
+            background-color: #36393f;
+            width: 600px;
+            height: 80vh;
+            border-radius: 5px;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .settings-close-button {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            color: #b9bbbe;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .settings-close-button:hover {
+            color: white;
+        }
+
+        .settings-sidebar {
+            width: 200px;
+            background-color: #2f3136;
+            padding: 16px 0;
+        }
+
+        .settings-category {
+            padding: 8px 16px;
+            color: #b9bbbe;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .settings-category.active {
+            background-color: rgba(114, 137, 218, 0.2);
+            color: white;
+        }
+
+        .settings-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-section h3 {
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .settings-option {
+            margin-bottom: 16px;
+        }
+
+        .settings-option label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b9bbbe;
+            font-size: 14px;
+        }
+
+        .settings-option input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            background-color: #303339;
+            border: 1px solid #222428;
+            border-radius: 3px;
+            color: white;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .theme-toggle label {
+            margin-right: 16px;
+            color: #b9bbbe;
+        }
+
+        .theme-option {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+
+        .theme-radio {
+            margin-right: 8px;
+        }
+
+        .status-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .status-option {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #2f3136;
+        }
+
+        .status-option:hover {
+            background-color: rgba(114, 137, 218, 0.1);
+        }
+
+        .status-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.online {
+            background-color: #3ba55c;
+        }
+
+        .status-indicator.dnd {
+            background-color: #ed4245;
+        }
+
+        .status-indicator.offline {
+            background-color: #747f8d;
+        }
+
+        .status-name {
+            font-size: 14px;
+        }
+
+        .settings-save-button {
+            background-color: #7289da;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .settings-danger-zone {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid #ed4245;
+        }
+
+        .settings-danger-zone h3 {
+            color: #ed4245;
+        }
+
+        .danger-button {
+            background-color: #ed4245;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .danger-button:hover {
+            background-color: #d13235;
+        }
+
+        /* DM chat */
+        .dm-header {
+            display: flex;
+            align-items: center;
+        }
+
+        .dm-back-button {
+            margin-right: 8px;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* Create channel button */
+        .add-channel {
+            cursor: pointer;
+            color: #72767d;
+        }
+
+        .add-channel:hover {
+            color: #dcddde;
+        }
+
+        /* Message input */
+        .message-input-container {
+            padding: 16px;
+            background-color: #40444b;
+            position: relative;
+        }
+
+        .message-input-wrapper {
+            display: flex;
+            align-items: center;
+            background-color: #383c42;
+            border-radius: 8px;
+            padding: 10px 16px;
+        }
+
+        .message-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 15px;
+            min-height: 20px;
+            max-height: 200px;
+            resize: none;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            line-height: 1.375;
+            overflow-y: auto;
+        }
+
+        .message-input::placeholder {
+            color: #a3a6aa;
+        }
+
+        .message-input-hint {
+            position: absolute;
+            top: -20px;
+            left: 16px;
+            font-size: 12px;
+            color: #a3a6aa;
+            pointer-events: none;
+        }
+
+        .message-input-actions {
+            display: flex;
+            align-items: center;
+            margin-left: 8px;
+        }
+
+        .message-input-action {
+            color: #b9bbbe;
+            cursor: pointer;
+            padding: 6px;
+            margin-left: 4px;
+            border-radius: 4px;
+        }
+
+        .message-input-action:hover {
+            color: white;
+            background-color: rgba(79, 84, 92, 0.4);
+        }
+
+        .send-button {
+            background-color: #7289da;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-left: 8px;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        .send-button:hover {
+            background-color: #677bc4;
+        }
+
+        .send-button:disabled {
+            background-color: #4e5a7d;
+            cursor: not-allowed;
+        }
+
+        /* Emoji picker */
+        .emoji-picker {
+            position: absolute;
+            bottom: 80px;
+            right: 16px;
+            background-color: #36393f;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            width: 300px;
+            height: 300px;
+            overflow-y: auto;
+            padding: 8px;
+            display: none;
+            z-index: 100;
+        }
+
+        .emoji-category {
+            margin-bottom: 8px;
+        }
+
+        .emoji-category-title {
+            font-size: 12px;
+            color: #b9bbbe;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+        }
+
+        .emoji {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .emoji:hover {
+            background-color: #7289da;
+        }
+
+        /* Voice channel UI */
+        .voice-channel-container {
+            padding: 16px;
+            text-align: center;
+        }
+
+        .voice-controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .voice-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #7289da;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .voice-button:hover {
+            background-color: #677bc4;
+        }
+
+        .voice-button.disconnect {
+            background-color: #ed4245;
+        }
+
+        .voice-button.disconnect:hover {
+            background-color: #d13235;
+        }
+
+        .voice-participants {
+            margin-top: 20px;
+        }
+
+        .voice-participant {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background-color: rgba(114, 137, 218, 0.1);
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .voice-participant-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #7289da;
+            margin-right: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: white;
+        }
+
+        .voice-participant-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .voice-participant-speaking {
+            margin-left: auto;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #3ba55c;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Confirmation modal */
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1002;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .confirmation-content {
+            background-color: #36393f;
+            width: 400px;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .confirmation-title {
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .confirmation-message {
+            color: #b9bbbe;
+            margin-bottom: 24px;
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .confirmation-button {
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .confirmation-cancel {
+            background-color: #4f545c;
+            color: white;
+        }
+
+        .confirmation-confirm {
+            background-color: #ed4245;
+            color: white;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .friends-sidebar, .channel-sidebar, .members-sidebar {
+                width: 100%;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                z-index: 100;
+                display: none;
+            }
+            
+            .friends-sidebar.active, .channel-sidebar.active, .members-sidebar.active {
+                display: flex;
+            }
+            
+            .chat-area {
+                margin-left: 72px;
+            }
+            
+            .send-button {
+                display: flex !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading screen -->
+    <div class="loading-screen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">WeTalk</div>
+    </div>
+
+    <!-- Auth container -->
+    <div class="auth-container" id="authContainer">
+        <div class="auth-box">
+            <div class="close-button" id="closeAuthButton">×</div>
+            <div class="auth-header">
+                <h2>Добро пожаловать обратно!</h2>
+                <p>Мы так рады снова вас видеть!</p>
+            </div>
+            <form class="auth-form" id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Электронная почта</label>
+                    <input type="email" id="loginEmail" required>
+                    <div class="error-message" id="loginEmailError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" required>
+                    <div class="error-message" id="loginPasswordError"></div>
+                </div>
+                <button type="submit" class="auth-button">Войти</button>
+            </form>
+            <div class="auth-footer">
+                Нужен аккаунт? <a id="registerLink">Зарегистрироваться</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register container -->
+    <div class="auth-container" id="registerContainer" style="display: none;">
+        <div class="auth-box">
+            <div class="close-button" id="closeRegisterButton">×</div>
+            <div class="auth-header">
+                <h2>Создать аккаунт</h2>
+                <p>Присоединяйтесь к WeTalk сегодня!</p>
+            </div>
+            <form class="auth-form" id="registerForm">
+                <div class="form-group">
+                    <label for="registerEmail">Электронная почта</label>
+                    <input type="email" id="registerEmail" required>
+                    <div class="error-message" id="registerEmailError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль</label>
+                    <input type="password" id="registerPassword" required>
+                    <div class="error-message" id="registerPasswordError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Подтвердите пароль</label>
+                    <input type="password" id="registerConfirmPassword" required>
+                    <div class="error-message" id="registerConfirmPasswordError"></div>
+                </div>
+                <button type="submit" class="auth-button">Продолжить</button>
+            </form>
+            <div class="auth-footer">
+                Уже есть аккаунт? <a id="loginLink">Войти</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main app -->
+    <div class="app-container" id="appContainer">
+        <div class="server-sidebar" id="serverSidebar">
+            <div class="server-icon add-server" id="addServerButton">+</div>
+        </div>
+        <div class="main-content">
+            <div class="friends-sidebar" id="friendsSidebar">
+                <div class="friends-header">WeTalk</div>
+                <div class="friends-tabs">
+                    <div class="tab active" id="homeTab">Главная</div>
+                    <div class="tab" id="friendsTab">Друзья</div>
+                </div>
+                <div class="friends-list" id="friendsList">
+                    <div class="no-friends">
+                        <p>У вас нет друзей.</p>
+                        <p>Но это можно исправить!</p>
+                    </div>
+                </div>
+                <div class="add-friend-form" id="addFriendForm">
+                    <input type="text" id="friendEmailInput" placeholder="Введите email друга">
+                    <button class="add-friend-button" id="addFriendButton">Добавить друга</button>
+                </div>
+            </div>
+            <div class="channel-sidebar" id="channelSidebar" style="display: none;">
+                <div class="channel-header" id="serverNameHeader">
+                    <span id="serverNameDisplay">Сервер</span>
+                    <div class="server-settings" id="serverSettingsButton">⚙️</div>
+                    <div class="server-settings-dropdown" id="serverSettingsDropdown">
+                        <div class="server-settings-item" id="leaveServerButton">Покинуть сервер</div>
+                        <div class="server-settings-item delete" id="deleteServerButton" style="display: none;">Удалить сервер</div>
+                    </div>
+                </div>
+                <div class="channel-category">
+                    <div class="category-header">
+                        <span>ТЕКСТОВЫЕ КАНАЛЫ</span>
+                        <span class="add-channel" id="addTextChannel">+</span>
+                    </div>
+                    <div class="channel-list" id="textChannelList"></div>
+                </div>
+                <div class="channel-category">
+                    <div class="category-header">
+                        <span>ГОЛОСОВЫЕ КАНАЛЫ</span>
+                        <span class="add-channel" id="addVoiceChannel">+</span>
+                    </div>
+                    <div class="channel-list" id="voiceChannelList"></div>
+                </div>
+            </div>
+            <div class="chat-area">
+                <div class="chat-header" id="chatHeader">
+                    <div class="dm-back-button" id="dmBackButton">←</div>
+                    <span id="chatTitle">Главная</span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <h2>Добро пожаловать в WeTalk!</h2>
+                        <p>Начните общение, добавив друзей или создав сервер.</p>
+                    </div>
+                </div>
+                <div class="message-input-container" id="messageInputContainer" style="display: none;">
+                    <div class="message-input-hint" id="messageInputHint">Написать сообщение</div>
+                    <div class="message-input-wrapper">
+                        <textarea id="messageInput" placeholder="Написать сообщение..." class="message-input" rows="1"></textarea>
+                        <div class="message-input-actions">
+                            <div class="message-input-action" id="emojiButton">😊</div>
+                            <button class="send-button" id="sendButton" disabled>→</button>
+                        </div>
+                    </div>
+                    <div class="emoji-picker" id="emojiPicker">
+                        <div class="emoji-category">
+                            <div class="emoji-category-title">Смайлы</div>
+                            <div class="emoji-grid">
+                                <div class="emoji">😀</div>
+                                <div class="emoji">😃</div>
+                                <div class="emoji">😄</div>
+                                <div class="emoji">😁</div>
+                                <div class="emoji">😆</div>
+                                <div class="emoji">😅</div>
+                                <div class="emoji">😂</div>
+                                <div class="emoji">🤣</div>
+                                <div class="emoji">😊</div>
+                                <div class="emoji">😇</div>
+                                <div class="emoji">🙂</div>
+                                <div class="emoji">🙃</div>
+                                <div class="emoji">😉</div>
+                                <div class="emoji">😌</div>
+                                <div class="emoji">😍</div>
+                                <div class="emoji">🥰</div>
+                                <div class="emoji">😘</div>
+                                <div class="emoji">😗</div>
+                                <div class="emoji">😙</div>
+                                <div class="emoji">😚</div>
+                                <div class="emoji">😋</div>
+                                <div class="emoji">😛</div>
+                                <div class="emoji">😝</div>
+                                <div class="emoji">😜</div>
+                                <div class="emoji">🤪</div>
+                                <div class="emoji">🤨</div>
+                                <div class="emoji">🧐</div>
+                                <div class="emoji">🤓</div>
+                                <div class="emoji">😎</div>
+                                <div class="emoji">🥸</div>
+                                <div class="emoji">🤩</div>
+                                <div class="emoji">🥳</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-panel">
+                    <div class="user-avatar" id="userAvatar">
+                        <img id="avatarImage" src="" alt="Avatar" style="display: none;">
+                        <span id="avatarInitials"></span>
+                    </div>
+                    <div class="user-info">
+                        <div class="username" id="usernameDisplay"></div>
+                        <div class="user-status" id="userStatus">Online</div>
+                    </div>
+                    <div class="user-controls">
+                        <div class="user-control" id="settingsButton">⚙️</div>
+                    </div>
+                </div>
+            </div>
+            <div class="members-sidebar" id="membersSidebar" style="display: none;">
+                <div class="members-header">УЧАСТНИКИ — <span id="membersCount">0</span></div>
+                <div id="membersList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avatar modal -->
+    <div class="avatar-modal" id="avatarModal">
+        <div class="avatar-modal-content">
+            <div class="avatar-close-button" id="avatarCloseButton">×</div>
+            <div class="avatar-modal-header">
+                <h3>Изменить аватар</h3>
+            </div>
+            <div class="avatar-preview">
+                <img id="avatarPreview" src="" alt="Preview" style="display: none;">
+                <span id="avatarPreviewInitials"></span>
+            </div>
+            <div class="avatar-upload">
+                <input type="file" id="avatarUpload" accept="image/*">
+                <label for="avatarUpload" class="avatar-upload-label">Выбрать изображение</label>
+            </div>
+            <div class="avatar-modal-buttons">
+                <button class="avatar-cancel-button" id="avatarCancelButton">Отмена</button>
+                <button class="avatar-save-button" id="avatarSaveButton">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Server modal -->
+    <div class="server-modal" id="serverModal">
+        <div class="server-modal-content">
+            <div class="server-close-button" id="serverCloseButton">×</div>
+            <div class="server-modal-header">
+                <h3>Создать сервер</h3>
+                <p>Дайте вашему серверу индивидуальность с помощью имени и иконки.</p>
+            </div>
+            <div class="server-form-group">
+                <label for="serverName">Имя сервера</label>
+                <input type="text" id="serverName" placeholder="Введите имя сервера">
+            </div>
+            <div class="server-modal-buttons">
+                <button class="server-cancel-button" id="serverCancelButton">Отмена</button>
+                <button class="server-create-button" id="serverCreateButton">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Channel modal -->
+    <div class="server-modal" id="channelModal">
+        <div class="server-modal-content">
+            <div class="server-close-button" id="channelCloseButton">×</div>
+            <div class="server-modal-header">
+                <h3 id="channelModalTitle">Создать текстовый канал</h3>
+                <p id="channelModalDescription">Текстовые каналы — это места для общения по определенным темам.</p>
+            </div>
+            <div class="server-form-group">
+                <label for="channelName">Имя канала</label>
+                <input type="text" id="channelName" placeholder="Введите имя канала">
+            </div>
+            <div class="server-modal-buttons">
+                <button class="server-cancel-button" id="channelCancelButton">Отмена</button>
+                <button class="server-create-button" id="channelCreateButton">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings modal -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-modal-content">
+            <div class="settings-close-button" id="settingsCloseButton">×</div>
+            <div class="settings-sidebar">
+                <div class="settings-category active" data-section="account">Мой аккаунт</div>
+                <div class="settings-category" data-section="appearance">Внешний вид</div>
+                <div class="settings-category" data-section="friends">Друзья</div>
+                <div class="settings-category" data-section="danger">Опасная зона</div>
+            </div>
+            <div class="settings-content">
+                <!-- Account settings -->
+                <div class="settings-section" id="accountSection">
+                    <h3>Мой аккаунт</h3>
+                    <div class="settings-option">
+                        <label>Аватар</label>
+                        <div class="user-avatar" id="settingsAvatar" style="width: 80px; height: 80px; cursor: pointer;">
+                            <img id="settingsAvatarImage" src="" alt="Avatar" style="display: none;">
+                            <span id="settingsAvatarInitials"></span>
+                        </div>
+                    </div>
+                    <div class="settings-option">
+                        <label for="usernameInput">Имя пользователя</label>
+                        <input type="text" id="usernameInput">
+                    </div>
+                    <div class="settings-option">
+                        <label for="emailInput">Электронная почта</label>
+                        <input type="text" id="emailInput" disabled>
+                    </div>
+                    <button class="settings-save-button" id="saveAccountSettings">Сохранить изменения</button>
+                </div>
+
+                <!-- Appearance settings -->
+                <div class="settings-section" id="appearanceSection" style="display: none;">
+                    <h3>Внешний вид</h3>
+                    <div class="settings-option">
+                        <label>Тема</label>
+                        <div class="theme-toggle">
+                            <div class="theme-option">
+                                <input type="radio" id="darkTheme" name="theme" class="theme-radio" checked>
+                                <label for="darkTheme">Тёмная</label>
+                            </div>
+                            <div class="theme-option">
+                                <input type="radio" id="lightTheme" name="theme" class="theme-radio">
+                                <label for="lightTheme">Светлая</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="settings-save-button" id="saveAppearanceSettings">Сохранить изменения</button>
+                </div>
+
+                <!-- Friends settings -->
+                <div class="settings-section" id="friendsSection" style="display: none;">
+                    <h3>Друзья</h3>
+                    <div class="settings-option">
+                        <label>Статус</label>
+                        <div class="status-options">
+                            <div class="status-option" data-status="online">
+                                <div class="status-indicator online"></div>
+                                <div class="status-name">Online</div>
+                            </div>
+                            <div class="status-option" data-status="dnd">
+                                <div class="status-indicator dnd"></div>
+                                <div class="status-name">Не беспокоить</div>
+                            </div>
+                            <div class="status-option" data-status="offline">
+                                <div class="status-indicator offline"></div>
+                                <div class="status-name">Offline</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="settings-save-button" id="saveFriendsSettings">Сохранить изменения</button>
+                </div>
+
+                <!-- Danger zone -->
+                <div class="settings-section" id="dangerSection" style="display: none;">
+                    <div class="settings-danger-zone">
+                        <h3>Опасная зона</h3>
+                        <div class="settings-option">
+                            <label>Выход из учетной записи</label>
+                            <p>Вы выйдете из текущей учетной записи, но сможете войти снова.</p>
+                            <button class="danger-button" id="logoutButton">Выйти</button>
+                        </div>
+                        <div class="settings-option">
+                            <label>Удаление учетной записи</label>
+                            <p>Ваш аккаунт и все данные будут удалены безвозвратно.</p>
+                            <button class="danger-button" id="deleteAccountButton">Удалить аккаунт</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation modal -->
+    <div class="confirmation-modal" id="confirmationModal">
+        <div class="confirmation-content">
+            <h3 class="confirmation-title" id="confirmationTitle">Подтверждение</h3>
+            <p class="confirmation-message" id="confirmationMessage"></p>
+            <div class="confirmation-buttons">
+                <button class="confirmation-button confirmation-cancel" id="confirmationCancel">Отмена</button>
+                <button class="confirmation-button confirmation-confirm" id="confirmationConfirm">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate loading
+        setTimeout(() => {
+            document.querySelector('.loading-screen').style.display = 'none';
+            document.getElementById('authContainer').style.display = 'flex';
+        }, 5000);
+
+        // Switch between login and register forms
+        document.getElementById('registerLink').addEventListener('click', () => {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('registerContainer').style.display = 'flex';
+        });
+
+        document.getElementById('loginLink').addEventListener('click', () => {
+            document.getElementById('registerContainer').style.display = 'none';
+            document.getElementById('authContainer').style.display = 'flex';
+        });
+
+        // Close buttons
+        document.getElementById('closeAuthButton').addEventListener('click', () => {
+            document.getElementById('authContainer').style.display = 'none';
+        });
+
+        document.getElementById('closeRegisterButton').addEventListener('click', () => {
+            document.getElementById('registerContainer').style.display = 'none';
+        });
+
+        document.getElementById('avatarCloseButton').addEventListener('click', () => {
+            document.getElementById('avatarModal').style.display = 'none';
+        });
+
+        document.getElementById('serverCloseButton').addEventListener('click', () => {
+            document.getElementById('serverModal').style.display = 'none';
+        });
+
+        document.getElementById('channelCloseButton').addEventListener('click', () => {
+            document.getElementById('channelModal').style.display = 'none';
+        });
+
+        document.getElementById('settingsCloseButton').addEventListener('click', () => {
+            document.getElementById('settingsModal').style.display = 'none';
+        });
+
+        // User accounts storage
+        let users = JSON.parse(localStorage.getItem('wetalk_users')) || [];
+        let servers = JSON.parse(localStorage.getItem('wetalk_servers')) || [];
+        let messages = JSON.parse(localStorage.getItem('wetalk_messages')) || {};
+        let voiceChannels = JSON.parse(localStorage.getItem('wetalk_voice_channels')) || {};
+        let currentUser = null;
+        let currentServer = null;
+        let currentChannel = null;
+        let currentDM = null;
+        let inVoiceChannel = null;
+
+        // Default avatars colors
+        const avatarColors = ['#7289da', '#3ba55c', '#faa61a', '#ed4245', '#593695', '#eb459e', '#57f287'];
+
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            let hasError = false;
+            
+            // Reset errors
+            document.getElementById('loginEmailError').style.display = 'none';
+            document.getElementById('loginPasswordError').style.display = 'none';
+            
+            // Validate email
+            if (!email) {
+                document.getElementById('loginEmailError').textContent = 'Пожалуйста, введите email';
+                document.getElementById('loginEmailError').style.display = 'block';
+                hasError = true;
+            }
+            
+            // Validate password
+            if (!password) {
+                document.getElementById('loginPasswordError').textContent = 'Пожалуйста, введите пароль';
+                document.getElementById('loginPasswordError').style.display = 'block';
+                hasError = true;
+            }
+            
+            if (hasError) return;
+            
+            // Check if user exists
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (!user) {
+                document.getElementById('loginPasswordError').textContent = 'Неверный email или пароль';
+                document.getElementById('loginPasswordError').style.display = 'block';
+                return;
+            }
+            
+            // Login successful
+            localStorage.setItem('wetalk_current_user', JSON.stringify(user));
+            document.getElementById('authContainer').style.display = 'none';
+            showApp(user);
+        });
+
+        // Register form
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            let hasError = false;
+            
+            // Reset errors
+            document.getElementById('registerEmailError').style.display = 'none';
+            document.getElementById('registerPasswordError').style.display = 'none';
+            document.getElementById('registerConfirmPasswordError').style.display = 'none';
+            
+            // Validate email
+            if (!email) {
+                document.getElementById('registerEmailError').textContent = 'Пожалуйста, введите email';
+                document.getElementById('registerEmailError').style.display = 'block';
+                hasError = true;
+            } else if (users.some(u => u.email === email)) {
+                document.getElementById('registerEmailError').textContent = 'Этот email уже занят';
+                document.getElementById('registerEmailError').style.display = 'block';
+                hasError = true;
+            }
+            
+            // Validate password
+            if (!password) {
+                document.getElementById('registerPasswordError').textContent = 'Пожалуйста, введите пароль';
+                document.getElementById('registerPasswordError').style.display = 'block';
+                hasError = true;
+            } else if (password.length < 6) {
+                document.getElementById('registerPasswordError').textContent = 'Пароль должен быть не менее 6 символов';
+                document.getElementById('registerPasswordError').style.display = 'block';
+                hasError = true;
+            }
+            
+            // Validate confirm password
+            if (!confirmPassword) {
+                document.getElementById('registerConfirmPasswordError').textContent = 'Пожалуйста, подтвердите пароль';
+                document.getElementById('registerConfirmPasswordError').style.display = 'block';
+                hasError = true;
+            } else if (password !== confirmPassword) {
+                document.getElementById('registerConfirmPasswordError').textContent = 'Пароли не совпадают';
+                document.getElementById('registerConfirmPasswordError').style.display = 'block';
+                hasError = true;
+            }
+            
+            if (hasError) return;
+            
+            // Create new user
+            const username = email.split('@')[0];
+            const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)];
+            
+            const newUser = {
+                email,
+                password,
+                username,
+                avatar: null,
+                avatarColor: randomColor,
+                status: 'online',
+                friends: []
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('wetalk_users', JSON.stringify(users));
+            localStorage.setItem('wetalk_current_user', JSON.stringify(newUser));
+            
+            document.getElementById('registerContainer').style.display = 'none';
+            showApp(newUser);
+        });
+
+        // Show main app
+        function showApp(user) {
+            currentUser = user;
+            document.getElementById('appContainer').style.display = 'flex';
+            
+            // Set user info
+            document.getElementById('usernameDisplay').textContent = user.username;
+            document.getElementById('userStatus').textContent = user.status === 'dnd' ? 'Не беспокоить' : 
+                                                              user.status === 'offline' ? 'Offline' : 'Online';
+            
+            // Set avatar
+            updateAvatar(user);
+            
+            // Load servers
+            loadServers();
+            
+            // Load friends
+            loadFriends();
+            
+            // Tab switching
+            document.getElementById('homeTab').addEventListener('click', () => {
+                document.getElementById('homeTab').classList.add('active');
+                document.getElementById('friendsTab').classList.remove('active');
+                document.getElementById('friendsList').style.display = 'block';
+                document.getElementById('addFriendForm').style.display = 'none';
+                document.getElementById('channelSidebar').style.display = 'none';
+                document.getElementById('friendsSidebar').style.display = 'block';
+                document.getElementById('membersSidebar').style.display = 'none';
+                document.getElementById('messageInputContainer').style.display = 'none';
+                document.getElementById('chatTitle').textContent = 'Главная';
+                document.getElementById('dmBackButton').style.display = 'none';
+                
+                // Show welcome message
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="welcome-message">
+                        <h2>Добро пожаловать в WeTalk!</h2>
+                        <p>Начните общение, добавив друзей или создав сервер.</p>
+                    </div>
+                `;
+                
+                currentServer = null;
+                currentChannel = null;
+                currentDM = null;
+            });
+            
+            document.getElementById('friendsTab').addEventListener('click', () => {
+                document.getElementById('friendsTab').classList.add('active');
+                document.getElementById('homeTab').classList.remove('active');
+                document.getElementById('friendsList').style.display = 'none';
+                document.getElementById('addFriendForm').style.display = 'block';
+                document.getElementById('channelSidebar').style.display = 'none';
+                document.getElementById('friendsSidebar').style.display = 'block';
+                document.getElementById('membersSidebar').style.display = 'none';
+                document.getElementById('messageInputContainer').style.display = 'none';
+                document.getElementById('chatTitle').textContent = 'Добавить друзей';
+                document.getElementById('dmBackButton').style.display = 'none';
+                
+                // Show add friend message
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="welcome-message">
+                        <h2>Добавьте друзей</h2>
+                        <p>Введите email друга, чтобы начать общение.</p>
+                    </div>
+                `;
+                
+                currentServer = null;
+                currentChannel = null;
+                currentDM = null;
+            });
+            
+            // Avatar editing
+            document.getElementById('userAvatar').addEventListener('click', () => {
+                document.getElementById('avatarModal').style.display = 'flex';
+            });
+            
+            document.getElementById('avatarCancelButton').addEventListener('click', () => {
+                document.getElementById('avatarModal').style.display = 'none';
+            });
+            
+            document.getElementById('avatarUpload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                        alert('Размер файла не должен превышать 2MB');
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        document.getElementById('avatarPreview').src = event.target.result;
+                        document.getElementById('avatarPreview').style.display = 'block';
+                        document.getElementById('avatarPreviewInitials').style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            document.getElementById('avatarSaveButton').addEventListener('click', () => {
+                const preview = document.getElementById('avatarPreview');
+                if (preview.style.display === 'block') {
+                    const avatarUrl = preview.src;
+                    
+                    // Update current user
+                    const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+                    currentUser.avatar = avatarUrl;
+                    localStorage.setItem('wetalk_current_user', JSON.stringify(currentUser));
+                    
+                    // Update in users list
+                    const userIndex = users.findIndex(u => u.email === currentUser.email);
+                    if (userIndex !== -1) {
+                        users[userIndex].avatar = avatarUrl;
+                        localStorage.setItem('wetalk_users', JSON.stringify(users));
+                    }
+                    
+                    // Update UI
+                    updateAvatar(currentUser);
+                    
+                    document.getElementById('avatarModal').style.display = 'none';
+                }
+            });
+            
+            // Add server button
+            document.getElementById('addServerButton').addEventListener('click', () => {
+                document.getElementById('serverModal').style.display = 'flex';
+            });
+            
+            // Server modal
+            document.getElementById('serverCancelButton').addEventListener('click', () => {
+                document.getElementById('serverModal').style.display = 'none';
+            });
+            
+            document.getElementById('serverCreateButton').addEventListener('click', () => {
+                const serverName = document.getElementById('serverName').value.trim();
+                if (!serverName) {
+                    alert('Пожалуйста, введите имя сервера');
+                    return;
+                }
+                
+                const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+                
+                const newServer = {
+                    id: Date.now().toString(),
+                    name: serverName,
+                    owner: currentUser.email,
+                    members: [currentUser.email],
+                    textChannels: [{
+                        id: Date.now().toString() + '1',
+                        name: 'общий'
+                    }],
+                    voiceChannels: [{
+                        id: Date.now().toString() + '2',
+                        name: 'Голосовой канал'
+                    }]
+                };
+                
+                servers.push(newServer);
+                localStorage.setItem('wetalk_servers', JSON.stringify(servers));
+                
+                // Initialize messages for channels
+                if (!messages[newServer.id]) {
+                    messages[newServer.id] = {};
+                }
+                
+                newServer.textChannels.forEach(channel => {
+                    messages[newServer.id][channel.id] = [];
+                });
+                
+                localStorage.setItem('wetalk_messages', JSON.stringify(messages));
+                
+                document.getElementById('serverModal').style.display = 'none';
+                document.getElementById('serverName').value = '';
+                
+                loadServers();
+            });
+            
+            // Add channel buttons
+            document.getElementById('addTextChannel').addEventListener('click', () => {
+                document.getElementById('channelModal').style.display = 'flex';
+                document.getElementById('channelModalTitle').textContent = 'Создать текстовый канал';
+                document.getElementById('channelModalDescription').textContent = 'Текстовые каналы — это места для общения по определенным темам.';
+                document.getElementById('channelCreateButton').dataset.channelType = 'text';
+            });
+            
+            document.getElementById('addVoiceChannel').addEventListener('click', () => {
+                document.getElementById('channelModal').style.display = 'flex';
+                document.getElementById('channelModalTitle').textContent = 'Создать голосовой канал';
+                document.getElementById('channelModalDescription').textContent = 'Голосовые каналы позволяют общаться голосом с другими участниками.';
+                document.getElementById('channelCreateButton').dataset.channelType = 'voice';
+            });
+            
+            // Channel modal
+            document.getElementById('channelCancelButton').addEventListener('click', () => {
+                document.getElementById('channelModal').style.display = 'none';
+            });
+            
+            document.getElementById('channelCreateButton').addEventListener('click', () => {
+                const channelName = document.getElementById('channelName').value.trim();
+                if (!channelName) {
+                    alert('Пожалуйста, введите имя канала');
+                    return;
+                }
+                
+                const channelType = document.getElementById('channelCreateButton').dataset.channelType;
+                
+                const serverIndex = servers.findIndex(s => s.id === currentServer.id);
+                if (serverIndex !== -1) {
+                    const newChannel = {
+                        id: Date.now().toString(),
+                        name: channelName
+                    };
+                    
+                    if (channelType === 'text') {
+                        servers[serverIndex].textChannels.push(newChannel);
+                        
+                        // Initialize messages for this channel
+                        if (!messages[currentServer.id]) {
+                            messages[currentServer.id] = {};
+                        }
+                        messages[currentServer.id][newChannel.id] = [];
+                        localStorage.setItem('wetalk_messages', JSON.stringify(messages));
+                    } else {
+                        servers[serverIndex].voiceChannels.push(newChannel);
+                        
+                        // Initialize voice channel
+                        if (!voiceChannels[currentServer.id]) {
+                            voiceChannels[currentServer.id] = {};
+                        }
+                        voiceChannels[currentServer.id][newChannel.id] = [];
+                        localStorage.setItem('wetalk_voice_channels', JSON.stringify(voiceChannels));
+                    }
+                    
+                    localStorage.setItem('wetalk_servers', JSON.stringify(servers));
+                    loadServerChannels(currentServer);
+                }
+                
+                document.getElementById('channelModal').style.display = 'none';
+                document.getElementById('channelName').value = '';
+            });
+            
+            // Add friend button
+            document.getElementById('addFriendButton').addEventListener('click', () => {
+                const email = document.getElementById('friendEmailInput').value.trim();
+                if (!email) {
+                    alert('Пожалуйста, введите email друга');
+                    return;
+                }
+                
+                const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+                
+                // Check if friend exists
+                const friend = users.find(u => u.email === email);
+                if (!friend) {
+                    alert('Пользователь с таким email не найден');
+                    return;
+                }
+                
+                // Check if already friends
+                if (currentUser.friends.includes(email)) {
+                    alert('Этот пользователь уже у вас в друзьях');
+                    return;
+                }
+                
+                // Add friend
+                currentUser.friends.push(email);
+                localStorage.setItem('wetalk_current_user', JSON.stringify(currentUser));
+                
+                // Update in users list
+                const userIndex = users.findIndex(u => u.email === currentUser.email);
+                if (userIndex !== -1) {
+                    users[userIndex].friends = currentUser.friends;
+                    localStorage.setItem('wetalk_users', JSON.stringify(users));
+                }
+                
+                document.getElementById('friendEmailInput').value = '';
+                loadFriends();
+            });
+            
+            // Settings button
+            document.getElementById('settingsButton').addEventListener('click', () => {
+                document.getElementById('settingsModal').style.display = 'flex';
+                
+                // Load current settings
+                const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+                
+                // Account settings
+                document.getElementById('usernameInput').value = currentUser.username;
+                document.getElementById('emailInput').value = currentUser.email;
+                
+                // Appearance settings
+                if (document.body.classList.contains('light-theme')) {
+                    document.getElementById('lightTheme').checked = true;
+                } else {
+                    document.getElementById('darkTheme').checked = true;
+                }
+                
+                // Update avatar in settings
+                const settingsAvatarInitials = currentUser.username.substring(0, 2).toUpperCase();
+                document.getElementById('settingsAvatarInitials').textContent = settingsAvatarInitials;
+                
+                if (currentUser.avatar) {
+                    document.getElementById('settingsAvatarImage').src = currentUser.avatar;
+                    document.getElementById('settingsAvatarImage').style.display = 'block';
+                    document.getElementById('settingsAvatarInitials').style.display = 'none';
+                } else {
+                    document.getElementById('settingsAvatarImage').style.display = 'none';
+                    document.getElementById('settingsAvatarInitials').style.display = 'block';
+                }
+                
+                // Highlight current status
+                document.querySelectorAll('.status-option').forEach(option => {
+                    option.style.backgroundColor = option.dataset.status === currentUser.status ? 
+                        'rgba(114, 137, 218, 0.2)' : '';
+                });
+            });
+            
+            // Settings sidebar navigation
+            document.querySelectorAll('.settings-category').forEach(category => {
+                category.addEventListener('click', () => {
+                    document.querySelectorAll('.settings-category').forEach(c => c.classList.remove('active'));
+                    category.classList.add('active');
+                    
+                    document.querySelectorAll('.settings-section').forEach(section => {
+                        section.style.display = 'none';
+                    });
+                    
+                    document.getElementById(category.dataset.section + 'Section').style.display = 'block';
+                });
+            });
+            
+            // Status selection
+            document.querySelectorAll('.status-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.status-option').forEach(opt => {
+                        opt.style.backgroundColor = '';
+                    });
+                    
+                    option.style.backgroundColor = 'rgba(114, 137, 218, 0.2)';
+                    
+                    const status = option.dataset.status;
+                    document.getElementById('statusSelect').value = status;
+                });
+            });
+            
+            // Save account settings
+            document.getElementById('saveAccountSettings').addEventListener('click', () => {
+                const username = document.getElementById('usernameInput').value.trim();
+                if (!username) {
+                    alert('Пожалуйста, введите имя пользователя');
+                    return;
+                }
+                
+                const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+                currentUser.username = username;
+                localStorage.setItem('wetalk_current_user', JSON.stringify(currentUser));
+                
+                // Update in users list
+                const userIndex = users.findIndex(u => u.email === currentUser.email);
+                if (userIndex !== -1) {
+                    users[userIndex].username = username;
+                    localStorage.setItem('wetalk_users', JSON.stringify(users));
+                }
+                
+                // Update UI
+                document.getElementById('usernameDisplay').textContent = username;
+                document.getElementById('avatarInitials').textContent = username.substring(0, 2).toUpperCase();
+                document.getElementById('settingsAvatarInitials').textContent = username.substring(0, 2).toUpperCase();
+                
+                alert('Настройки сохранены');
+            });
+            
+            // Save appearance settings
+            document.getElementById('saveAppearanceSettings').addEventListener('click', () => {
+                const theme = document.querySelector('input[name="theme"]:checked').value;
+                
+                if (theme === 'light') {
+                    document.body.classList.add('light-theme');
+                } else {
+                    document.body.classList.remove('light-theme');
+                }
+                
+                alert('Настройки сохранены');
+            });
+            
+            // Save friends settings
+            document.getElementById('saveFriendsSettings').addEventListener('click', () => {
+                const status = document.getElementById('statusSelect').value;
+                
+                const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+                currentUser.status = status;
+                localStorage.setItem('wetalk_current_user', JSON.stringify(currentUser));
+                
+                // Update in users list
+                const userIndex = users.findIndex(u => u.email === currentUser.email);
+                if (userIndex !== -1) {
+                    users[userIndex].status = status;
+                    localStorage.setItem('wetalk_users', JSON.stringify(users));
+                }
+                
+                // Update UI
+                document.getElementById('userStatus').textContent = 
+                    status === 'dnd' ? 'Не беспокоить' : 
+                    status === 'offline' ? 'Offline' : 'Online';
+                
+                alert('Настройки сохранены');
+            });
+            
+            // Settings avatar click
+            document.getElementById('settingsAvatar').addEventListener('click', () => {
+                document.getElementById('settingsModal').style.display = 'none';
+                document.getElementById('avatarModal').style.display = 'flex';
+            });
+            
+            // Logout button
+            document.getElementById('logoutButton').addEventListener('click', () => {
+                showConfirmation(
+                    'Выход из учетной записи',
+                    'Вы уверены, что хотите выйти из текущей учетной записи?',
+                    () => {
+                        localStorage.removeItem('wetalk_current_user');
+                        document.getElementById('appContainer').style.display = 'none';
+                        document.getElementById('settingsModal').style.display = 'none';
+                        document.getElementById('authContainer').style.display = 'flex';
+                    }
+                );
+            });
+            
+            // Delete account button
+            document.getElementById('deleteAccountButton').addEventListener('click', () => {
+                showConfirmation(
+                    'Удаление учетной записи',
+                    'Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить. Все ваши данные будут удалены.',
+                    () => {
+                        const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+                        
+                        // Remove user from servers
+                        servers.forEach(server => {
+                            const memberIndex = server.members.indexOf(currentUser.email);
+                            if (memberIndex !== -1) {
+                                server.members.splice(memberIndex, 1);
+                                
+                                // If owner, delete server
+                                if (server.owner === currentUser.email) {
+                                    const serverIndex = servers.findIndex(s => s.id === server.id);
+                                    if (serverIndex !== -1) {
+                                        servers.splice(serverIndex, 1);
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // Remove user from users list
+                        const userIndex = users.findIndex(u => u.email === currentUser.email);
+                        if (userIndex !== -1) {
+                            users.splice(userIndex, 1);
+                        }
+                        
+                        // Remove user from friends lists
+                        users.forEach(user => {
+                            const friendIndex = user.friends.indexOf(currentUser.email);
+                            if (friendIndex !== -1) {
+                                user.friends.splice(friendIndex, 1);
+                            }
+                        });
+                        
+                        // Save changes
+                        localStorage.setItem('wetalk_users', JSON.stringify(users));
+                        localStorage.setItem('wetalk_servers', JSON.stringify(servers));
+                        localStorage.removeItem('wetalk_current_user');
+                        
+                        document.getElementById('appContainer').style.display = 'none';
+                        document.getElementById('settingsModal').style.display = 'none';
+                        document.getElementById('authContainer').style.display = 'flex';
+                    }
+                );
+            });
+            
+            // DM back button
+            document.getElementById('dmBackButton').addEventListener('click', () => {
+                document.getElementById('dmBackButton').style.display = 'none';
+                document.getElementById('chatTitle').textContent = 'Друзья';
+                document.getElementById('messageInputContainer').style.display = 'none';
+                
+                // Show friends list
+                document.getElementById('friendsList').style.display = 'block';
+                document.getElementById('addFriendForm').style.display = 'none';
+                
+                // Clear chat
+                document.getElementById('chatMessages').innerHTML = '';
+                
+                currentDM = null;
+            });
+            
+            // Server settings button
+            document.getElementById('serverSettingsButton').addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('serverSettingsDropdown').style.display = 
+                    document.getElementById('serverSettingsDropdown').style.display === 'block' ? 'none' : 'block';
+            });
+            
+            // Leave server button
+            document.getElementById('leaveServerButton').addEventListener('click', () => {
+                if (currentServer) {
+                    showConfirmation(
+                        'Покинуть сервер',
+                        `Вы уверены, что хотите покинуть сервер "${currentServer.name}"?`,
+                        () => {
+                            const serverIndex = servers.findIndex(s => s.id === currentServer.id);
+                            if (serverIndex !== -1) {
+                                const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+                                const memberIndex = servers[serverIndex].members.indexOf(currentUser.email);
+                                
+                                if (memberIndex !== -1) {
+                                    servers[serverIndex].members.splice(memberIndex, 1);
+                                    localStorage.setItem('wetalk_servers', JSON.stringify(servers));
+                                    
+                                    // If owner left, delete server
+                                    if (servers[serverIndex].owner === currentUser.email) {
+                                        servers.splice(serverIndex, 1);
+                                        localStorage.setItem('wetalk_servers', JSON.stringify(servers));
+                                        
+                                        // Remove messages for this server
+                                        delete messages[currentServer.id];
+                                        localStorage.setItem('wetalk_messages', JSON.stringify(messages));
+                                        
+                                        // Remove voice channels for this server
+                                        delete voiceChannels[currentServer.id];
+                                        localStorage.setItem('wetalk_voice_channels', JSON.stringify(voiceChannels));
+                                    }
+                                    
+                                    loadServers();
+                                    document.getElementById('homeTab').click();
+                                }
+                            }
+                            document.getElementById('serverSettingsDropdown').style.display = 'none';
+                        }
+                    );
+                }
+            });
+            
+            // Delete server button (for owner)
+            document.getElementById('deleteServerButton').addEventListener('click', () => {
+                if (currentServer) {
+                    showConfirmation(
+                        'Удаление сервера',
+                        `Вы уверены, что хотите удалить сервер "${currentServer.name}"? Это действие нельзя отменить.`,
+                        () => {
+                            const serverIndex = servers.findIndex(s => s.id === currentServer.id);
+                            if (serverIndex !== -1) {
+                                servers.splice(serverIndex, 1);
+                                localStorage.setItem('wetalk_servers', JSON.stringify(servers));
+                                
+                                // Remove messages for this server
+                                delete messages[currentServer.id];
+                                localStorage.setItem('wetalk_messages', JSON.stringify(messages));
+                                
+                                // Remove voice channels for this server
+                                delete voiceChannels[currentServer.id];
+                                localStorage.setItem('wetalk_voice_channels', JSON.stringify(voiceChannels));
+                                
+                                loadServers();
+                                document.getElementById('homeTab').click();
+                            }
+                            document.getElementById('serverSettingsDropdown').style.display = 'none';
+                        }
+                    );
+                }
+            });
+            
+            // Message input
+            const messageInput = document.getElementById('messageInput');
+            
+            messageInput.addEventListener('input', (e) => {
+                // Auto-resize textarea
+                e.target.style.height = 'auto';
+                e.target.style.height = (e.target.scrollHeight) + 'px';
+                
+                // Toggle send button
+                document.getElementById('sendButton').disabled = !e.target.value.trim();
+                
+                // Update hint based on context
+                updateMessageInputHint();
+            });
+            
+            messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey && e.target.value.trim()) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            document.getElementById('sendButton').addEventListener('click', () => {
+                if (messageInput.value.trim()) {
+                    sendMessage();
+                }
+            });
+            
+            // Emoji button
+            document.getElementById('emojiButton').addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('emojiPicker').style.display = 
+                    document.getElementById('emojiPicker').style.display === 'block' ? 'none' : 'block';
+            });
+            
+            // Emoji selection
+            document.querySelectorAll('.emoji').forEach(emoji => {
+                emoji.addEventListener('click', (e) => {
+                    messageInput.value += e.target.textContent;
+                    messageInput.focus();
+                    document.getElementById('sendButton').disabled = !messageInput.value.trim();
+                    
+                    // Trigger input event to resize textarea
+                    const event = new Event('input');
+                    messageInput.dispatchEvent(event);
+                });
+            });
+            
+            // Close emoji picker when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.message-input-action') && !e.target.closest('.emoji-picker')) {
+                    document.getElementById('emojiPicker').style.display = 'none';
+                }
+                
+                if (!e.target.closest('.server-settings') && !e.target.closest('.server-settings-dropdown')) {
+                    document.getElementById('serverSettingsDropdown').style.display = 'none';
+                }
+            });
+            
+            // Mobile menu toggle
+            document.getElementById('chatHeader').addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    if (currentServer) {
+                        document.getElementById('channelSidebar').classList.toggle('active');
+                    } else if (currentDM) {
+                        document.getElementById('friendsSidebar').classList.toggle('active');
+                    } else {
+                        document.getElementById('friendsSidebar').classList.toggle('active');
+                    }
+                }
+            });
+        }
+
+        function updateMessageInputHint() {
+            const hint = document.getElementById('messageInputHint');
+            if (!hint) return;
+            
+            if (currentChannel) {
+                hint.textContent = `Написать сообщение в #${currentChannel.name}`;
+            } else if (currentDM) {
+                hint.textContent = `Написать сообщение ${currentDM.username}`;
+            } else {
+                hint.textContent = 'Написать сообщение';
+            }
+        }
+
+        function sendMessage() {
+            const messageText = document.getElementById('messageInput').value.trim();
+            const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+            
+            if (currentChannel) {
+                // Server text channel message
+                const message = {
+                    id: Date.now().toString(),
+                    author: currentUser.email,
+                    text: messageText,
+                    timestamp: new Date().toISOString()
+                };
+                
+                if (!messages[currentServer.id]) {
+                    messages[currentServer.id] = {};
+                }
+                
+                if (!messages[currentServer.id][currentChannel.id]) {
+                    messages[currentServer.id][currentChannel.id] = [];
+                }
+                
+                messages[currentServer.id][currentChannel.id].push(message);
+                localStorage.setItem('wetalk_messages', JSON.stringify(messages));
+                
+                displayChannelMessages(currentChannel.id);
+            } else if (currentDM) {
+                // Direct message
+                const dmId = [currentUser.email, currentDM.email].sort().join('-');
+                
+                if (!messages[dmId]) {
+                    messages[dmId] = [];
+                }
+                
+                const message = {
+                    id: Date.now().toString(),
+                    author: currentUser.email,
+                    text: messageText,
+                    timestamp: new Date().toISOString()
+                };
+                
+                messages[dmId].push(message);
+                localStorage.setItem('wetalk_messages', JSON.stringify(messages));
+                
+                displayDMMessages(currentDM);
+            }
+            
+            // Reset input
+            document.getElementById('messageInput').value = '';
+            document.getElementById('messageInput').style.height = 'auto';
+            document.getElementById('sendButton').disabled = true;
+            
+            // Close emoji picker
+            document.getElementById('emojiPicker').style.display = 'none';
+        }
+
+        function showConfirmation(title, message, confirmCallback) {
+            document.getElementById('confirmationTitle').textContent = title;
+            document.getElementById('confirmationMessage').textContent = message;
+            document.getElementById('confirmationModal').style.display = 'flex';
+            
+            document.getElementById('confirmationCancel').onclick = () => {
+                document.getElementById('confirmationModal').style.display = 'none';
+            };
+            
+            document.getElementById('confirmationConfirm').onclick = () => {
+                confirmCallback();
+                document.getElementById('confirmationModal').style.display = 'none';
+            };
+        }
+
+        function updateAvatar(user) {
+            const avatarInitials = user.username.substring(0, 2).toUpperCase();
+            document.getElementById('avatarInitials').textContent = avatarInitials;
+            document.getElementById('avatarPreviewInitials').textContent = avatarInitials;
+            
+            // Set avatar background color
+            if (user.avatarColor) {
+                document.getElementById('avatarInitials').parentElement.style.backgroundColor = user.avatarColor;
+                document.getElementById('avatarPreviewInitials').parentElement.style.backgroundColor = user.avatarColor;
+            }
+            
+            if (user.avatar) {
+                document.getElementById('avatarImage').src = user.avatar;
+                document.getElementById('avatarImage').style.display = 'block';
+                document.getElementById('avatarInitials').style.display = 'none';
+                
+                document.getElementById('avatarPreview').src = user.avatar;
+                document.getElementById('avatarPreview').style.display = 'block';
+                document.getElementById('avatarPreviewInitials').style.display = 'none';
+            } else {
+                document.getElementById('avatarImage').style.display = 'none';
+                document.getElementById('avatarInitials').style.display = 'block';
+                
+                document.getElementById('avatarPreview').style.display = 'none';
+                document.getElementById('avatarPreviewInitials').style.display = 'block';
+            }
+        }
+
+        function loadServers() {
+            const serverSidebar = document.getElementById('serverSidebar');
+            // Clear existing servers except the add button
+            while (serverSidebar.children.length > 1) {
+                serverSidebar.removeChild(serverSidebar.lastChild);
+            }
+            
+            const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+            
+            servers.filter(server => server.members.includes(currentUser.email)).forEach(server => {
+                const serverIcon = document.createElement('div');
+                serverIcon.className = 'server-icon';
+                serverIcon.textContent = server.name.substring(0, 2).toUpperCase();
+                serverIcon.dataset.serverId = server.id;
+                
+                // Set random color for server icon
+                const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)];
+                serverIcon.style.backgroundColor = randomColor;
+                
+                serverIcon.addEventListener('click', () => {
+                    // Highlight active server
+                    document.querySelectorAll('.server-icon').forEach(icon => {
+                        icon.classList.remove('server-active');
+                    });
+                    serverIcon.classList.add('server-active');
+                    
+                    // Show server channels
+                    currentServer = server;
+                    currentChannel = null;
+                    currentDM = null;
+                    
+                    document.getElementById('friendsSidebar').style.display = 'none';
+                    document.getElementById('channelSidebar').style.display = 'block';
+                    document.getElementById('serverNameDisplay').textContent = server.name;
+                    document.getElementById('chatTitle').textContent = server.name;
+                    document.getElementById('dmBackButton').style.display = 'none';
+                    document.getElementById('messageInputContainer').style.display = 'none';
+                    document.getElementById('membersSidebar').style.display = 'block';
+                    
+                    // Show delete button if owner
+                    document.getElementById('deleteServerButton').style.display = 
+                        server.owner === currentUser.email ? 'block' : 'none';
+                    
+                    // Clear chat
+                    document.getElementById('chatMessages').innerHTML = `
+                        <div class="welcome-message">
+                            <h2>Добро пожаловать на ${server.name}!</h2>
+                            <p>Выберите канал, чтобы начать общение.</p>
+                        </div>
+                    `;
+                    
+                    loadServerChannels(server);
+                    loadServerMembers(server);
+                });
+                
+                serverSidebar.insertBefore(serverIcon, document.getElementById('addServerButton'));
+            });
+        }
+
+        function loadServerChannels(server) {
+            const textChannelList = document.getElementById('textChannelList');
+            const voiceChannelList = document.getElementById('voiceChannelList');
+            
+            // Clear existing channels
+            textChannelList.innerHTML = '';
+            voiceChannelList.innerHTML = '';
+            
+            // Add text channels
+            server.textChannels.forEach(channel => {
+                const channelItem = document.createElement('div');
+                channelItem.className = 'channel-item';
+                channelItem.innerHTML = `<span class="hash">#</span> ${channel.name}`;
+                channelItem.dataset.channelId = channel.id;
+                channelItem.dataset.channelType = 'text';
+                
+                channelItem.addEventListener('click', () => {
+                    // Highlight active channel
+                    document.querySelectorAll('.channel-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    channelItem.classList.add('active');
+                    
+                    currentChannel = channel;
+                    currentDM = null;
+                    
+                    document.getElementById('chatTitle').textContent = `#${channel.name}`;
+                    document.getElementById('dmBackButton').style.display = 'none';
+                    document.getElementById('messageInputContainer').style.display = 'block';
+                    document.getElementById('membersSidebar').style.display = 'block';
+                    
+                    // Update message input hint
+                    updateMessageInputHint();
+                    
+                    // Display messages for this channel
+                    displayChannelMessages(channel.id);
+                });
+                
+                textChannelList.appendChild(channelItem);
+            });
+            
+            // Add voice channels
+            server.voiceChannels.forEach(channel => {
+                const channelItem = document.createElement('div');
+                channelItem.className = 'channel-item';
+                channelItem.innerHTML = `<span class="voice">🔊</span> ${channel.name}`;
+                channelItem.dataset.channelId = channel.id;
+                channelItem.dataset.channelType = 'voice';
+                
+                channelItem.addEventListener('click', () => {
+                    // Highlight active channel
+                    document.querySelectorAll('.channel-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    channelItem.classList.add('active');
+                    
+                    currentChannel = channel;
+                    currentDM = null;
+                    
+                    document.getElementById('chatTitle').textContent = `🔊 ${channel.name}`;
+                    document.getElementById('dmBackButton').style.display = 'none';
+                    document.getElementById('messageInputContainer').style.display = 'none';
+                    document.getElementById('membersSidebar').style.display = 'block';
+                    
+                    // Show voice channel UI
+                    displayVoiceChannel(channel);
+                });
+                
+                voiceChannelList.appendChild(channelItem);
+            });
+        }
+
+        function loadServerMembers(server) {
+            const membersList = document.getElementById('membersList');
+            const membersCount = document.getElementById('membersCount');
+            
+            membersList.innerHTML = '';
+            membersCount.textContent = server.members.length;
+            
+            server.members.forEach(memberEmail => {
+                const member = users.find(u => u.email === memberEmail);
+                if (!member) return;
+                
+                const statusClass = member.status === 'online' ? 'online' : 
+                                  member.status === 'dnd' ? 'dnd' : '';
+                
+                const memberItem = document.createElement('div');
+                memberItem.className = 'member-item';
+                memberItem.innerHTML = `
+                    <div class="member-avatar" style="background-color: ${member.avatarColor || '#7289da'}">
+                        ${member.username.substring(0, 2).toUpperCase()}
+                        <div class="member-status ${statusClass}"></div>
+                    </div>
+                    <div class="member-info">
+                        <div class="member-name">${member.username}</div>
+                        <div class="member-status-text">${member.status === 'dnd' ? 'Не беспокоить' : member.status === 'offline' ? 'Offline' : 'Online'}</div>
+                    </div>
+                `;
+                
+                membersList.appendChild(memberItem);
+            });
+        }
+
+        function displayChannelMessages(channelId) {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            if (!messages[currentServer.id] || !messages[currentServer.id][channelId]) {
+                chatMessages.innerHTML = `
+                    <div class="welcome-message">
+                        <h2>Добро пожаловать в #${currentChannel.name}!</h2>
+                        <p>Это начало канала #${currentChannel.name}.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const channelMessages = messages[currentServer.id][channelId];
+            
+            if (channelMessages.length === 0) {
+                chatMessages.innerHTML = `
+                    <div class="welcome-message">
+                        <h2>Добро пожаловать в #${currentChannel.name}!</h2>
+                        <p>Это начало канала #${currentChannel.name}.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            channelMessages.forEach(msg => {
+                const author = users.find(u => u.email === msg.author);
+                if (!author) return;
+                
+                const messageTime = new Date(msg.timestamp);
+                const timeString = messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message';
+                messageElement.innerHTML = `
+                    <div class="message-avatar" style="background-color: ${author.avatarColor || '#7289da'}">${author.username.substring(0, 2).toUpperCase()}</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <div class="message-author">${author.username}</div>
+                            <div class="message-time">${timeString}</div>
+                        </div>
+                        <div class="message-text">${msg.text}</div>
+                    </div>
+                `;
+                
+                chatMessages.appendChild(messageElement);
+            });
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function displayDMMessages(friend) {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+            const dmId = [currentUser.email, friend.email].sort().join('-');
+            
+            if (!messages[dmId] || messages[dmId].length === 0) {
+                chatMessages.innerHTML = `
+                    <div class="welcome-message">
+                        <h2>Личные сообщения с ${friend.username}</h2>
+                        <p>Это начало вашей переписки с ${friend.username}.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            messages[dmId].forEach(msg => {
+                const author = users.find(u => u.email === msg.author);
+                if (!author) return;
+                
+                const messageTime = new Date(msg.timestamp);
+                const timeString = messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message';
+                messageElement.innerHTML = `
+                    <div class="message-avatar" style="background-color: ${author.avatarColor || '#7289da'}">${author.username.substring(0, 2).toUpperCase()}</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <div class="message-author">${author.username}</div>
+                            <div class="message-time">${timeString}</div>
+                        </div>
+                        <div class="message-text">${msg.text}</div>
+                    </div>
+                `;
+                
+                chatMessages.appendChild(messageElement);
+            });
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function displayVoiceChannel(channel) {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+            
+            const voiceUI = document.createElement('div');
+            voiceUI.className = 'voice-channel-container';
+            
+            voiceUI.innerHTML = `
+                <h2>🔊 ${channel.name}</h2>
+                <p>Присоединитесь к голосовому каналу, чтобы начать разговор.</p>
+                <div class="voice-controls">
+                    <div class="voice-button ${inVoiceChannel === channel.id ? 'disconnect' : ''}" id="voiceControlButton">
+                        ${inVoiceChannel === channel.id ? 'Отключиться' : 'Подключиться'}
+                    </div>
+                </div>
+                <div class="voice-participants" id="voiceParticipants">
+                    <h3>Участники</h3>
+                </div>
+            `;
+            
+            chatMessages.appendChild(voiceUI);
+            
+            // Update participants list
+            updateVoiceParticipants(channel.id);
+            
+            // Voice control button
+            document.getElementById('voiceControlButton').addEventListener('click', () => {
+                if (inVoiceChannel === channel.id) {
+                    // Disconnect from voice channel
+                    const channelData = voiceChannels[currentServer.id][channel.id];
+                    const userIndex = channelData.indexOf(currentUser.email);
+                    if (userIndex !== -1) {
+                        channelData.splice(userIndex, 1);
+                        localStorage.setItem('wetalk_voice_channels', JSON.stringify(voiceChannels));
+                    }
+                    inVoiceChannel = null;
+                } else {
+                    // Connect to voice channel
+                    if (inVoiceChannel) {
+                        // Leave current voice channel first
+                        const currentChannelData = voiceChannels[currentServer.id][inVoiceChannel];
+                        const userIndex = currentChannelData.indexOf(currentUser.email);
+                        if (userIndex !== -1) {
+                            currentChannelData.splice(userIndex, 1);
+                            localStorage.setItem('wetalk_voice_channels', JSON.stringify(voiceChannels));
+                        }
+                    }
+                    
+                    if (!voiceChannels[currentServer.id][channel.id]) {
+                        voiceChannels[currentServer.id][channel.id] = [];
+                    }
+                    
+                    voiceChannels[currentServer.id][channel.id].push(currentUser.email);
+                    localStorage.setItem('wetalk_voice_channels', JSON.stringify(voiceChannels));
+                    inVoiceChannel = channel.id;
+                }
+                
+                // Update UI
+                displayVoiceChannel(channel);
+            });
+        }
+
+        function updateVoiceParticipants(channelId) {
+            const voiceParticipants = document.getElementById('voiceParticipants');
+            if (!voiceParticipants) return;
+            
+            // Clear existing participants except header
+            while (voiceParticipants.children.length > 1) {
+                voiceParticipants.removeChild(voiceParticipants.lastChild);
+            }
+            
+            if (!voiceChannels[currentServer.id] || !voiceChannels[currentServer.id][channelId]) {
+                return;
+            }
+            
+            voiceChannels[currentServer.id][channelId].forEach(userEmail => {
+                const user = users.find(u => u.email === userEmail);
+                if (!user) return;
+                
+                const participant = document.createElement('div');
+                participant.className = 'voice-participant';
+                participant.innerHTML = `
+                    <div class="voice-participant-avatar" style="background-color: ${user.avatarColor || '#7289da'}">${user.username.substring(0, 2).toUpperCase()}</div>
+                    <div class="voice-participant-name">${user.username}</div>
+                    ${userEmail === currentUser.email ? '<div class="voice-participant-speaking"></div>' : ''}
+                `;
+                
+                voiceParticipants.appendChild(participant);
+            });
+        }
+
+        function loadFriends() {
+            const friendsList = document.getElementById('friendsList');
+            const currentUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+            
+            if (currentUser.friends.length === 0) {
+                friendsList.innerHTML = `
+                    <div class="no-friends">
+                        <p>У вас нет друзей.</p>
+                        <p>Но это можно исправить!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            friendsList.innerHTML = '';
+            
+            currentUser.friends.forEach(friendEmail => {
+                const friend = users.find(u => u.email === friendEmail);
+                if (!friend) return;
+                
+                const statusClass = friend.status === 'online' ? 'online' : 
+                                  friend.status === 'dnd' ? 'dnd' : '';
+                
+                const friendItem = document.createElement('div');
+                friendItem.className = 'friend-item';
+                
+                friendItem.innerHTML = `
+                    <div class="friend-avatar" style="background-color: ${friend.avatarColor || '#7289da'}">
+                        ${friend.username.substring(0, 2).toUpperCase()}
+                        <div class="friend-status ${statusClass}"></div>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.username}</div>
+                        <div class="friend-status-text">${friend.status === 'dnd' ? 'Не беспокоить' : friend.status === 'offline' ? 'Offline' : 'Online'}</div>
+                    </div>
+                `;
+                
+                friendItem.addEventListener('click', () => {
+                    currentDM = friend;
+                    currentServer = null;
+                    currentChannel = null;
+                    
+                    document.getElementById('friendsList').style.display = 'none';
+                    document.getElementById('addFriendForm').style.display = 'none';
+                    document.getElementById('channelSidebar').style.display = 'none';
+                    document.getElementById('friendsSidebar').style.display = 'block';
+                    document.getElementById('membersSidebar').style.display = 'none';
+                    document.getElementById('chatTitle').textContent = friend.username;
+                    document.getElementById('dmBackButton').style.display = 'inline-block';
+                    document.getElementById('messageInputContainer').style.display = 'block';
+                    
+                    // Update message input hint
+                    updateMessageInputHint();
+                    
+                    // Show DM messages
+                    displayDMMessages(friend);
+                });
+                
+                friendsList.appendChild(friendItem);
+            });
+        }
+
+        // Check if user is already logged in
+        const savedUser = JSON.parse(localStorage.getItem('wetalk_current_user'));
+        if (savedUser) {
+            document.querySelector('.loading-screen').style.display = 'none';
+            showApp(savedUser);
+        }
+    </script>
+</body>
+</html>
